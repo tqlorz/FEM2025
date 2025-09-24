@@ -1,0 +1,200 @@
+\documentclass[a4paper]{article}
+\usepackage{ctex}
+\usepackage[affil-it]{authblk}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{bm}
+
+\usepackage{geometry}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+\addbibresource{citation.bib}
+
+\begin{document}
+% =================================================
+\title{有限元方法 2025 秋冬作业一}
+
+\author{曾申昊 3220100701
+  \thanks{邮箱: \texttt{3097714673@qq.com}
+                            \texttt{或} \texttt{3220100701@zju.edu.cn}}}
+\affil{电子科学与技术 2202，浙江大学 }
+
+
+\date{更新时间: \today}
+
+\maketitle
+
+
+% ============================================
+\section*{1. 验证恒等式}
+
+\begin{enumerate}
+    \item[(a)] 
+    \begin{equation}
+        \nabla \cdot (u\vec{v}) = \partial_i \cdot (u v_i)
+                = (\partial_i u) v_i + u (\partial_i v_i)
+                = (\nabla u) \cdot v + u \nabla \cdot \vec{v}
+    \end{equation}
+    \item[(b)] 
+    \begin{equation}
+        \begin{aligned}
+            \left[\nabla \times (u\vec{v})\right]_i
+        &=\varepsilon_{ijk}\partial_j (u v_k)
+        =\varepsilon_{ijk}(\partial_j u) v_k + u \varepsilon_{ijk}\partial_j v_k\\
+        \Rightarrow 
+        \nabla \times (u\vec{v}) &= (\nabla u) \times \vec{v} + u \nabla \times \vec{v}
+        \end{aligned}
+    \end{equation}
+    \item[(c)] 
+    \begin{equation}
+        \begin{aligned}
+            \left[\nabla\times(\nabla\times\vec{u})\right]_i&=
+        \varepsilon_{ijk}\partial_j\varepsilon_{kmn}\partial_m u_n
+        =\varepsilon_{ijk}\varepsilon_{kmn}\partial_j\partial_m u_n\\
+        &=(\delta_{im}\delta_{jn}-\delta_{in}\delta_{jm})\partial_j\partial_m u_n
+        =\partial_j\partial_i u_j - \partial_j\partial_j u_i\\
+        \Rightarrow 
+        \nabla\times(\nabla\times\vec{u}) &= 
+        \nabla(\nabla \times \vec{u}) - \Delta \vec{u}
+        \end{aligned}
+    \end{equation}
+\end{enumerate}
+
+\section*{2. 二维区域中的格林公式和散度定理}
+
+\begin{enumerate}
+    \item[(a)] 若函数 $P(x,y)$，$Q(x,y)$ 在区域 $\Omega$ 上连续，
+    且具有连续的一阶偏导数，则有
+    \begin{equation}
+        \int_{\Omega} \left(\frac{\partial Q}{\partial x}
+        -\frac{\partial P}{\partial y}\right) \text{d}S
+        = \int_{\partial \Omega} P\text{d}x + Q\text{d}y
+    \end{equation}
+    \item[(b)] 若 $\vec{F}(x,y)$ 是定义在 $\Omega$ 中
+    和 $\partial \Omega$ 上连续可微的向量场，则有
+    \begin{equation}
+        \int_{\Omega} \nabla \cdot \vec{F} \text{d}S
+        = \int_{\partial \Omega} \vec{F} \cdot \vec{n} \text{d}l
+    \end{equation}
+    \item[(c)] 令 $\vec{F}(x,y) = (Q(x,y), -P(x,y))$，易知二者等价
+    \begin{equation}
+        \left\{
+            \begin{aligned}
+                \int_{\Omega} \nabla \cdot \vec{F} \text{d}S
+                    &=\int_{\Omega} (\partial_x, \partial_y) \cdot (Q, -P) \text{d}S
+                    =\int_{\Omega} \left(\frac{\partial Q}{\partial x}
+                    -\frac{\partial P}{\partial y}\right) \text{d}S\\
+                \int_{\partial \Omega} \vec{F} \cdot \vec{n} \text{d}l
+                    &=\int_{\partial \Omega} (Q,-P) \cdot (\sin \theta, -\cos \theta) \text{d}l
+                    =\int_{\partial \Omega} P\cos \theta\text{d}l + Q\sin \theta\text{d}l
+                    =\int_{\partial \Omega} P\text{d}x + Q\text{d}y
+            \end{aligned}
+        \right.
+    \end{equation}
+\end{enumerate}
+
+\section*{3. 三维区域中旋度的分部积分公式}
+
+\begin{equation}
+    \begin{aligned}
+        \int_{\partial \Omega}(\vec{n}\times \vec{u}) \cdot \vec{v} \text{d}S
+        &=\int_{\partial \Omega}\varepsilon_{ijk}n_j u_k v_i \text{d}S\\
+        &=\int_{\Omega}\partial_j(\varepsilon_{ijk}u_k v_i) \text{d}\Omega\\
+        &=\int_{\Omega}\varepsilon_{ijk}(\partial_j u_k) v_i \text{d}\Omega
+        +\int_{\Omega}\varepsilon_{ijk} u_k (\partial_j v_i) \text{d}\Omega\\
+        &=\int_{\Omega}(\nabla \times \vec{u}) \cdot \vec{v} \text{d}\Omega
+        -\int_{\Omega}\vec{u} \cdot (\nabla \times \vec{v}) \text{d}\Omega
+    \end{aligned}
+\end{equation}
+
+\section*{4. 二维区域中 Neumann 边界条件的 Poisson 方程}
+
+\vspace*{-4ex}
+
+\begin{align}
+    -\Delta u &= f \quad \text{in} \  \Omega
+    \label{Poisson 方程}\\
+    \frac{\partial u}{\partial n} &= 0 \quad \text{on} \  \partial \Omega
+    \label{Neumann 边界条件}
+\end{align}
+
+\begin{enumerate}
+    \item[(a)] 对式 (\ref{Poisson 方程}) 两边积分，应用散度定理，带入边界条件可得
+    \begin{equation}
+        \int_{\Omega} f \text{d}S = -\int_{\Omega} \Delta u \text{d}S 
+                = -\int_{\Omega} \nabla \cdot \nabla u \text{d}S 
+                = -\int_{\partial\Omega} \frac{\partial u}{\partial n}  \text{d}l 
+                = 0
+    \end{equation}
+    \item[(b)] 若 $u_0$ 为该方程的一个解，那么对于任意 $C\in R$，$u_0+C$ 
+                同样是方程的解。
+    \item[(c)] 该问题的有限元方法可以由以下推导得到
+    \begin{equation}
+        \begin{gathered}
+            -\int_{\Omega} (\Delta u) v \text{d}S = \int_{\Omega} f v \text{d}S\\
+            -\int_{\partial\Omega} (\nabla u \cdot \vec{n}) v \text{d}l
+            + \int_{\Omega} \nabla u \cdot \nabla v \text{d}S
+            =\int_{\Omega} f v \text{d}S\\
+            -\int_{\partial\Omega} \frac{\partial u}{\partial n} v \text{d}l
+            + \int_{\Omega} \nabla u \cdot \nabla v \text{d}S
+            =\int_{\Omega} f v \text{d}S\\
+            \int_{\Omega} \nabla u \cdot \nabla v \text{d}S
+            =\int_{\Omega} f v \text{d}S
+        \end{gathered}
+    \end{equation}
+    用分片线性函数空间 $V_h$ 近似，则有限元问题为：
+    \begin{equation}
+        \int_{\Omega} \nabla u_h \cdot \nabla v_h \text{d}S
+            =\int_{\Omega} f v_h \text{d}S
+    \end{equation}
+    代入 $u_h= u_1\phi_1 + \cdots + u_{NV}\phi_{NV}$ 并
+    令 $v_h=\phi_j$ 可得线性方程组
+    \begin{equation}
+        \sum_{i=1}^{NV} u_i \int_{\Omega} \nabla \phi_i \cdot \nabla \phi_j \text{d}S
+            =\int_{\Omega} f \phi_j \text{d}S \qquad j=1,2,\ldots,NV    
+    \end{equation}
+    \item[(d)] 参照讲义中用于生成矩阵 $A$ 的算法，考虑其局部刚度矩阵 $A_k$
+    \begin{equation}
+        A_k =
+        \begin{pmatrix}
+            \int_{T_k}\nabla \phi_{k1} \cdot \nabla \phi_{k1} \text{d}x &
+            \int_{T_k}\nabla \phi_{k1} \cdot \nabla \phi_{k2} \text{d}x &
+            \int_{T_k}\nabla \phi_{k1} \cdot \nabla \phi_{k3} \text{d}x\\
+            \int_{T_k}\nabla \phi_{k2} \cdot \nabla \phi_{k1} \text{d}x &
+            \int_{T_k}\nabla \phi_{k2} \cdot \nabla \phi_{k2} \text{d}x &
+            \int_{T_k}\nabla \phi_{k2} \cdot \nabla \phi_{k3} \text{d}x\\
+            \int_{T_k}\nabla \phi_{k3} \cdot \nabla \phi_{k1} \text{d}x &
+            \int_{T_k}\nabla \phi_{k3} \cdot \nabla \phi_{k2} \text{d}x &
+            \int_{T_k}\nabla \phi_{k3} \cdot \nabla \phi_{k3} \text{d}x
+        \end{pmatrix}
+        \label{局部刚度矩阵}
+    \end{equation}
+    考虑式 (\ref{局部刚度矩阵}) 与列向量 $(1,1,1)^T$ 的乘积
+    \begin{equation}
+        A_k
+        \begin{pmatrix}
+            1\\1\\1
+        \end{pmatrix}
+        =
+        \begin{pmatrix}
+            \int_{T_k}\nabla \phi_{k1} \cdot (\nabla \phi_{k1}
+            + \nabla \phi_{k2} + \nabla \phi_{k3}) \text{d}x\\
+            \int    _{T_k}\nabla \phi_{k2} \cdot (\nabla \phi_{k1}
+            + \nabla \phi_{k2} + \nabla \phi_{k3}) \text{d}x\\
+            \int_{T_k}\nabla \phi_{k3} \cdot (\nabla \phi_{k1}
+            + \nabla \phi_{k2} + \nabla \phi_{k3}) \text{d}x
+        \end{pmatrix}
+    \end{equation}
+    易知 $\nabla \phi_{k1} + \nabla \phi_{k2} + \nabla \phi_{k3} = 0$，
+    故 $(1,1,1)^T\in \ker (A_k)$，矩阵 $A_k$ 是奇异的。因为矩阵 $A$ 是由 $A_k$
+    组装而成的，故矩阵 $A$ 也是奇异的。
+\end{enumerate}
+
+% ===============================================
+
+\printbibliography
+
+\end{document}
