@@ -1,0 +1,330 @@
+\documentclass[a4paper]{article}
+\usepackage{ctex}
+\usepackage[affil-it]{authblk}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{bm}
+\usepackage{pifont}
+
+\usepackage{geometry}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+\addbibresource{citation.bib}
+
+\begin{document}
+% =================================================
+\title{有限元方法 2025 秋冬作业二}
+
+\author{曾申昊 3220100701
+  \thanks{邮箱: \texttt{3097714673@qq.com}
+                            \texttt{或} \texttt{3220100701@zju.edu.cn}}}
+\affil{电子科学与技术 2202，浙江大学 }
+
+
+\date{更新时间: \today}
+
+\maketitle
+
+
+% ============================================
+\section*{1. 手算有限元刚度矩阵和局部刚度矩阵}
+
+先计算每个单元的局部刚度矩阵 $A_k$，其定义为
+
+\begin{equation}
+    A_k =
+    \begin{pmatrix}
+        \int_{T_k}\nabla \phi_{k_1} \cdot \nabla \phi_{k_1} \text{d}x &
+        \int_{T_k}\nabla \phi_{k_1} \cdot \nabla \phi_{k_2} \text{d}x &
+        \int_{T_k}\nabla \phi_{k_1} \cdot \nabla \phi_{k_3} \text{d}x\\
+        \int_{T_k}\nabla \phi_{k_2} \cdot \nabla \phi_{k_1} \text{d}x &
+        \int_{T_k}\nabla \phi_{k_2} \cdot \nabla \phi_{k_2} \text{d}x &
+        \int_{T_k}\nabla \phi_{k_2} \cdot \nabla \phi_{k_3} \text{d}x\\
+        \int_{T_k}\nabla \phi_{k_3} \cdot \nabla \phi_{k_1} \text{d}x &
+        \int_{T_k}\nabla \phi_{k_3} \cdot \nabla \phi_{k_2} \text{d}x &
+        \int_{T_k}\nabla \phi_{k_3} \cdot \nabla \phi_{k_3} \text{d}x
+    \end{pmatrix}
+    \label{局部刚度矩阵}
+\end{equation}
+
+根据对称性，我们只需计算三角形 \ding{172} 和 \ding{173} 的局部刚度矩阵。
+
+\begin{equation}
+    A_1 =
+    \begin{pmatrix}
+        \frac{1}{2} & 0 & -\frac{1}{2}\\
+        0 & \frac{1}{2} & -\frac{1}{2}\\
+        -\frac{1}{2} & -\frac{1}{2} & 1
+    \end{pmatrix}, \quad
+    A_2 =
+    \begin{pmatrix}
+        \frac{1}{2} & -\frac{1}{2} & 0\\
+        -\frac{1}{2} & 1 & -\frac{1}{2}\\
+        0 & -\frac{1}{2} & \frac{1}{2}
+    \end{pmatrix}
+\end{equation}
+
+将 8 个单元的局部刚度矩阵组装成全局刚度矩阵 $A$
+
+\begin{equation}
+    A =
+    \begin{pmatrix}
+        1 & -\frac{1}{2} & 0 & -\frac{1}{2} & 0 & 0 & 0 & 0 & 0\\
+        -\frac{1}{2} & 1 & -\frac{1}{2} & 0 & -\frac{1}{2} & 0 & 0 & 0 & 0\\
+        0 & -\frac{1}{2} & 1 & 0 & 0 & -\frac{1}{2} & 0 & 0 & 0\\
+        -\frac{1}{2} & 0 & 0 & 1 & -\frac{1}{2} & 0 & -\frac{1}{2} & 0 & 0\\
+        0 & -\frac{1}{2} & 0 & -\frac{1}{2} & 2 & -\frac{1}{2} & 0 & -\frac{1}{2} & 0\\
+        0 & 0 & -\frac{1}{2} & 0 & -\frac{1}{2} & 1 & 0 & 0 & -\frac{1}{2}\\
+        0 & 0 & 0 & -\frac{1}{2} & 0 & 0 & 1 & -\frac{1}{2} & 0\\
+        0 & 0 & 0 & 0 & -\frac{1}{2} & 0 & -\frac{1}{2} & 1& -\frac{1}{2}\\
+        0& 0& 0& 0& 0& -\frac{1}{2}& 0& -\frac{1}{2}& 1
+    \end{pmatrix}
+\end{equation}
+
+\section*{2. 二维区域中三角形网格$\mathcal{T}_h$及分片一次有限元空间$V_h$}
+
+\begin{enumerate}
+    \item[(a)] 我们知道有限元解 $u_h = \sum_{i=1}^{NV}u_i\phi_i$，
+        其中 $\phi_i\in V_h$ 是与节点 $i$ 相关的基函数，
+        $u_i$ 是通过解方程$A\vec{U}=\vec{F}$得到的有限元解在节点 $i$ 处的值。\\
+        由题可知，三角形 $T$ 三个顶点处的取值均为 $0$。
+        由于基函数的局部性以及线性插值的性质可知，
+        \begin{equation}
+            u_h \big|_T = \sum_{i=1}^{NV}u_i\phi_i \big|_T 
+                   = \sum_{i=1}^{3}u_{a_i}\phi_{a_i} 
+                   = \sum_{i=1}^{3}v(a_i)\phi_{a_i} 
+                   = 0
+        \end{equation}
+
+    \item[(b)] 有限元空间$V_h$可以如下描述，易知为有限维的线性空间。
+        \begin{equation}
+            V_h = 
+            \left\{
+                v_h \in C(\overline{\Omega}) :
+                v_h \big|_T \in \mathcal{P}_1(T), 
+                \forall \ T \in \mathcal{T}_h    
+            \right\}
+        \end{equation}
+        下证 ${\phi_i}$ 构成有限元空间的一组基底，即
+        \begin{equation}
+            c_1 \phi_1 + c_2 \phi_2 + \cdots + c_{NV} \phi_{NV} = 0
+        \end{equation}
+        其中 $0$ 为零函数，
+        由基函数的局部性 $\phi_i(x_j) = \delta_{ij}$，易得 $c_i=0$，
+        因此 ${\phi_i}$ 线性无关。
+        \\
+        另一方面，对于任意 $v_h \in V_h$，由分片线性插值的性质可知
+        \begin{equation}
+            v_h = \sum_{i=1}^{NV} v_h(x_i) \phi_i
+        \end{equation}
+        因此 ${\phi_i}$ 构成 $V_h$ 的一组基底。
+\end{enumerate} 
+
+\section*{3. 有限维的赋范线性空间及其线性映射}
+
+由于 $V$ 是有限维的赋范线性空间，由范数的等价性可知
+
+\begin{equation}
+    C_1 \Vert v \Vert_{1} \leq \Vert v \Vert_{V} \leq C_2 \Vert v \Vert_{1}
+\end{equation}
+
+设 $\{v_i\}_{1\leq i \leq n}$ 为 $V$ 的一组基，则 $\forall v \in V$，
+有 $v = \sum_{i=1}^{n}c_i v_i$，并令 $\Vert v\Vert_1 = \sum_{i=1}^{n}|c_i|$
+
+\begin{equation}
+    \begin{aligned}
+        \frac{\ell(v)}{\Vert v \Vert_V}
+        \leq \frac{1}{C_1} \frac{|\ell(v)|}{\Vert v \Vert_{1}}
+        &= \frac{1}{C_1} \frac{|\ell(\sum_{i=1}^{n}c_i v_i)|}{\Vert \sum_{i=1}^{n}c_i v_i \Vert_{1}}\\
+        &= \frac{1}{C_1} \frac{|\sum_{i=1}^{n}c_i \ell(v_i)|}{\sum_{i=1}^{n}|c_i|}\\
+        &\leq \frac{1}{C_1} \frac{\sum_{i=1}^{n}|c_i| |\ell(v_i)|}
+            {\sum_{i=1}^{n}|c_i|}\\
+        &\leq \frac{1}{C_1} \max_{1\leq i \leq n} |\ell(v_i)| < \infty   
+    \end{aligned}
+\end{equation}
+
+由此可知 $\Vert \ell \Vert_{V^{*}}$ 有界。
+
+\section*{4. $L^2(\Omega)$ 空间中函数列的相关定理}
+
+由 Cauchy-Schwarz 不等式可得，
+
+\begin{equation}
+    \begin{aligned}
+        \left(
+            \int_{\Omega} (u_n - u) v \text{d}x
+        \right)^2
+        &\leq \int_{\Omega} (u_n - u)^2 \text{d}x
+            \int_{\Omega} v^2 \text{d}x\\
+        &= \Vert u_n - u \Vert^2_{L^2(\Omega)} \Vert v \Vert^2_{L^2(\Omega)}
+        \rightarrow 0
+    \end{aligned}
+\end{equation}
+
+该积分收敛到 $0$，是由 $u_n \rightarrow u$ 在 $L^2(\Omega)$ 意义下收敛
+和 $\Vert v \Vert_{L^2(\Omega)}< \infty$ 保证的，易得
+
+\begin{equation}
+    \lim_{n \rightarrow \infty} \int_{\Omega} u_n v \text{d}x
+    = \int_{\Omega} u v \text{d}x
+\end{equation}
+
+\section*{5. 绝对连续函数的相关概念}
+
+\begin{enumerate}
+    \item[(a)] 对 $\forall \epsilon>0$，有 $\delta>0$，使对 $[0,1]$
+                上两两不相交的开区间 $\{(a_i,b_i)\}_{1\leq i \leq n}$ 满足
+                $\sum_{i=1}^{n} (b_i - a_i) < \delta$时，有
+                \begin{equation}
+                    \sum_{i=1}^{n} |f(b_i) - f(a_i)| < \epsilon
+                \end{equation}
+    \item[(b)] 对 $[0,1]$ 上两两不相交
+                且满足 $\sum_{i=1}^{n} (b_i - a_i) < \delta$ 的开区间 $\{(a_i,b_i)\}_{1\leq i \leq n}$ 有
+                \begin{equation}
+                    \begin{aligned}
+                        \sum_{i=1}^{n} |u(b_i) - u(a_i)|
+                        &= \sum_{i=1}^{n} \left|
+                            \int_{a_i}^{b_i} v(t) \text{d}t
+                        \right|\\
+                        &\leq \sum_{i=1}^{n} 
+                            \int_{a_i}^{b_i} |v(t)| \text{d}t\\
+                        &= \int_{\cup_{i=1}^{n}(a_i, b_i) } |v(t)| \text{d}t\\
+                    \end{aligned}
+                \end{equation} 
+                由积分的绝对连续性可证 $u(x)$ 为绝对连续函数。             
+\end{enumerate}
+
+\section*{6. 绝对连续函数的相关定理}
+
+令 $f(x) = u(x) v(x)$，由于 $u, v$ 均为 $[0,1]$ 上的绝对连续函数，
+因此 $f$ 也是 $[0,1]$ 上的绝对连续函数。
+
+\begin{equation}
+    f(1) - f(0) = \int_{0}^{1} f'(x) \text{d}x
+\end{equation}
+
+也就是
+
+\begin{equation}
+    \begin{aligned}
+        u(1)v(1) - u(0)v(0)
+        &= \int_{0}^{1} (uv)' \text{d}x\\
+        &= \int_{0}^{1} u'v \text{d}x
+            + \int_{0}^{1} uv' \text{d}x
+    \end{aligned}
+\end{equation}
+
+\section*{7. Dirichlet 边界条件的 Poisson 方程}
+
+\begin{enumerate}
+    \item[(c)] 令 $v_h = \sum_{i=1}^{NV}c_i \phi_i$，代入可得
+            \begin{equation}
+                \Vert \nabla v_h \Vert^2_{L^2(\Omega)}
+                = \int_{\Omega} 
+                    \left[\nabla \left(\sum_{i=1}^{NV}c_i \phi_i\right)\right]^2 \text{d}x
+                = \int_{\Omega} 
+                    \left( \sum_{i=1}^{NV}c_i \nabla \phi_i \right)^2 \text{d}x
+            \end{equation}
+            \begin{equation}
+                \vec{v_h}^\top A\vec{v_h}
+                =
+                \begin{pmatrix}
+                    c_1 & c_2 & \cdots & c_{NV}
+                \end{pmatrix}
+                \begin{pmatrix}
+                    \int_{\Omega} \nabla \phi_1 \cdot \nabla \phi_1 \text{d}x &
+                    \int_{\Omega} \nabla \phi_1 \cdot \nabla \phi_2 \text{d}x &
+                    \cdots &
+                    \int_{\Omega} \nabla \phi_1 \cdot \nabla \phi_{NV} \text{d}x\\
+                    \int_{\Omega} \nabla \phi_2 \cdot \nabla \phi_1 \text{d}x &
+                    \int_{\Omega} \nabla \phi_2 \cdot \nabla \phi_2 \text{d}x &
+                    \cdots &
+                    \int_{\Omega} \nabla \phi_2 \cdot \nabla \phi_{NV} \text{d}x\\
+                    \vdots & \vdots & \ddots & \vdots\\
+                    \int_{\Omega} \nabla \phi_{NV} \cdot \nabla \phi_1 \text{d}x &
+                    \int_{\Omega} \nabla \phi_{NV} \cdot \nabla \phi_2 \text{d}x &
+                    \cdots &
+                    \int_{\Omega} \nabla \phi_{NV} \cdot \nabla \phi_{NV} \text{d}x
+                \end{pmatrix}
+                \begin{pmatrix}
+                    c_1\\ c_2\\ \vdots\\ c_{NV}
+                \end{pmatrix}
+            \end{equation}  
+            比较可知，上面二者相等。
+    \item[(b)] 由定义知 $A_{ij} = \int_{\Omega} \nabla \phi_i \cdot \nabla \phi_j \text{d}x$ 
+                因此 $A_{ij} = A_{ji}$，所以 $A$ 是对称矩阵。\\
+                又由 (c) 可知 $\forall \vec{v_h} \neq \vec{0}$，有
+                \begin{equation}
+                    \vec{v_h}^\top A \vec{v_h}
+                    = \Vert \nabla v_h \Vert^2_{L^2(\Omega)} > 0
+                \end{equation}
+                因此 $A$ 是正定矩阵。
+    \item[(a)] $A$ 是正定矩阵，因此 $A$ 是非奇异矩阵，方程组 $A\vec{U}=\vec{F}$ 有唯一解。
+                由有限元方法的基本理论可知，有限元解 $u_h$ 存在且唯一。
+    
+\end{enumerate}
+
+\section*{8. Robin 边界条件下的Poisson 方程}
+
+\begin{enumerate}
+    \item[(a)] 该问题的有限元方法可以由以下推导得到
+    \begin{equation}
+        \begin{gathered}
+            -\int_{\Omega} (\Delta u) v \text{d}S = \int_{\Omega} f v \text{d}S\\
+            -\int_{\partial\Omega} (\nabla u \cdot \vec{n}) v \text{d}l
+            + \int_{\Omega} \nabla u \cdot \nabla v \text{d}S
+            =\int_{\Omega} f v \text{d}S\\
+            -\int_{\partial\Omega} \frac{\partial u}{\partial n} v \text{d}l
+            + \int_{\Omega} \nabla u \cdot \nabla v \text{d}S
+            =\int_{\Omega} f v \text{d}S\\
+            \int_{\partial\Omega} u v \text{d}l
+            + \int_{\Omega} \nabla u \cdot \nabla v \text{d}S
+            =\int_{\Omega} f v \text{d}S
+        \end{gathered}
+    \end{equation}
+    用分片线性函数空间 $V_h$ 近似，则有限元问题为：
+    \begin{equation}
+        \int_{\Omega} \nabla u_h \cdot \nabla v_h \text{d}S
+            =\int_{\Omega} f v_h \text{d}S
+            - \int_{\partial\Omega} u_h v_h \text{d}l 
+    \end{equation}
+    \item[(b)] 定义 Robin 边界条件下的能量泛函为
+    \begin{equation}
+        E(v) = \frac{1}{2} \int_{\Omega} |\nabla v|^2 \text{d}S
+            + \frac{1}{2} \int_{\partial\Omega} v^2 \text{d}l
+            - \int_{\Omega} f v \text{d}S
+    \end{equation}
+    该问题的 Ritz 方法为
+    \begin{equation}
+        u_h = \arg \min_{v_h \in V_h} E(v_h)
+    \end{equation}
+    \item[(c)] 定义 $\varphi(\lambda) = E(u + \lambda v)$，接下来我们
+                把 $\varphi(\lambda)$ 对 $\lambda$ 求导。
+            \begin{equation}
+                \begin{aligned}
+                    \varphi'(\lambda)
+                    &= \frac{1}{2} \int_{\Omega} 2\nabla (u + \lambda v) \cdot \nabla v \text{d}S
+                        + \frac{1}{2} \int_{\partial\Omega} 2(u + \lambda v)v \text{d}l
+                        - \int_{\Omega} f v \text{d}S\\
+                    &= \int_{\Omega} \nabla (u + \lambda v) \cdot \nabla v \text{d}S
+                        + \int_{\partial\Omega} (u + \lambda v)v \text{d}l
+                        - \int_{\Omega} f v \text{d}S
+                \end{aligned}
+            \end{equation}
+            由 $u$ 是该问题的解可知 $\varphi'(0) = 0$，也就是
+            \begin{equation}
+                \int_{\Omega} \nabla u \cdot \nabla v \text{d}S
+                    + \int_{\partial\Omega} uv \text{d}l
+                    = \int_{\Omega} f v \text{d}S
+            \end{equation}
+            所以上述的有限元方法和 Ritz 方法是等价的。
+\end{enumerate}
+
+% ===============================================
+
+\printbibliography
+
+\end{document}
