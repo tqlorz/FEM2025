@@ -220,6 +220,31 @@
 \section*{7. Dirichlet 边界条件的 Poisson 方程}
 
 \begin{enumerate}
+    \item[(a)] 令 $a(u,v)=\int_{\Omega}\nabla u \cdot \nabla v \text{d}x$，
+                验证其有界性和强制性。
+            \begin{equation}
+                |a(u,v)|
+                \leq \int_{\Omega} |\nabla u \cdot \nabla v| \text{d}x
+                \leq \int_{\Omega} |\nabla u| |\nabla v| \text{d}x
+                \leq \Vert \nabla u \Vert_{L^2(\Omega)}
+                    \Vert \nabla v \Vert_{L^2(\Omega)}
+                = |u|_{H^1(\Omega)}
+                    |v|_{H^1(\Omega)}
+            \end{equation}
+            \begin{equation}
+                |a(u,u)|
+                = \int_{\Omega} |\nabla u|^2 \text{d}x
+                = |u|_{H^1(\Omega)}^2
+            \end{equation}
+            根据 Lax-Milgram 定理可知该问题有唯一解。
+    \item[(b)] 由定义知 $A_{ij} = \int_{\Omega} \nabla \phi_i \cdot \nabla \phi_j \text{d}x$ 
+    因此 $A_{ij} = A_{ji}$，所以 $A$ 是对称矩阵。\\
+    又由 (c) 可知 $\forall \vec{v_h} \neq \vec{0}$，有
+    \begin{equation}
+        \vec{v_h}^\top A \vec{v_h}
+        = \Vert \nabla v_h \Vert^2_{L^2(\Omega)} > 0
+    \end{equation}
+    因此 $A$ 是正定矩阵。
     \item[(c)] 令 $v_h = \sum_{i=1}^{NV}c_i \phi_i$，代入可得
             \begin{equation}
                 \Vert \nabla v_h \Vert^2_{L^2(\Omega)}
@@ -254,16 +279,6 @@
                 \end{pmatrix}
             \end{equation}  
             比较可知，上面二者相等。
-    \item[(b)] 由定义知 $A_{ij} = \int_{\Omega} \nabla \phi_i \cdot \nabla \phi_j \text{d}x$ 
-                因此 $A_{ij} = A_{ji}$，所以 $A$ 是对称矩阵。\\
-                又由 (c) 可知 $\forall \vec{v_h} \neq \vec{0}$，有
-                \begin{equation}
-                    \vec{v_h}^\top A \vec{v_h}
-                    = \Vert \nabla v_h \Vert^2_{L^2(\Omega)} > 0
-                \end{equation}
-                因此 $A$ 是正定矩阵。
-    \item[(a)] $A$ 是正定矩阵，因此 $A$ 是非奇异矩阵，方程组 $A\vec{U}=\vec{F}$ 有唯一解。
-                由有限元方法的基本理论可知，有限元解 $u_h$ 存在且唯一。
     
 \end{enumerate}
 
