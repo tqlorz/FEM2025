@@ -5,6 +5,7 @@
 \usepackage{amsmath,amsthm,amssymb,amsfonts}
 \usepackage{bm}
 \usepackage{pifont}
+\usepackage{graphicx, subcaption}
 
 \usepackage{geometry}
 \geometry{margin=1.5cm, vmargin={0pt,1cm}}
@@ -490,6 +491,66 @@
 \end{enumerate}
 
 \section*{6. 分片一次的有限元方法编程}
+
+\begin{enumerate}
+    \item[(a)] 取 $h=0.25$，其网格剖分图像如图 \ref{$h=0.25$网格剖分图像} 所示
+                \begin{figure}[htbp]
+                    \centering
+                    \includegraphics[width=0.4\textwidth]
+                        {../../Programming/Linear Finite Element Methods/image/mesh.pdf}
+                    \caption{$h=0.25$网格剖分图像}
+                    \label{$h=0.25$网格剖分图像}
+                \end{figure}
+    \item[(b)] 当 $h=0.25$ 和 $h=0.125$ 时， $u_h$ 的图像
+                分别如图 \ref{$h=0.25$ 时 $u_h$ 的图像}
+                和图 \ref{$h=0.125$ 时 $u_h$ 的图像} 所示
+                \begin{figure}[htbp]
+                    \centering
+                    \begin{subfigure}{0.4\textwidth}
+                        \centering
+                        \includegraphics[width=\textwidth]
+                            {../../Programming/Linear Finite Element Methods/image/pic1FEM_0.25.pdf}
+                    \end{subfigure}
+                    \begin{subfigure}{0.4\textwidth}
+                        \centering
+                        \includegraphics[width=\textwidth]
+                            {../../Programming/Linear Finite Element Methods/image/pic2FEM_0.25.pdf}
+                    \end{subfigure}
+                    \caption{$h=0.25$ 时 $u_h$ 的图像}
+                    \label{$h=0.25$ 时 $u_h$ 的图像}
+                \end{figure}
+                \begin{figure}
+                    \centering
+                    \begin{subfigure}{0.4\textwidth}
+                        \centering
+                        \includegraphics[width=\textwidth]
+                            {../../Programming/Linear Finite Element Methods/image/pic1FEM_0.125.pdf}
+                    \end{subfigure}
+                    \begin{subfigure}{0.4\textwidth}
+                        \centering
+                        \includegraphics[width=\textwidth]
+                            {../../Programming/Linear Finite Element Methods/image/pic2FEM_0.125.pdf}
+                    \end{subfigure}
+                    \caption{$h=0.125$ 时 $u_h$ 的图像}
+                    \label{$h=0.125$ 时 $u_h$ 的图像}
+                \end{figure}
+    \item[(c)]  误差随网格尺寸变化的曲线如图 \ref{$H^1$ 范数下的误差}
+                和图 \ref{$L^2$ 范数下的误差} 所示
+                \begin{figure}[htbp]
+                    \centering
+                    \includegraphics[width=0.8\textwidth]
+                            {../../Programming/Linear Finite Element Methods/image/rateH1norm.pdf}
+                    \caption{$H^1$ 范数下的误差}
+                    \label{$H^1$ 范数下的误差}
+                \end{figure}
+                \begin{figure}[htbp]
+                    \centering
+                    \includegraphics[width=0.8\textwidth]
+                            {../../Programming/Linear Finite Element Methods/image/rateL2norm.pdf}
+                    \caption{$L^2$ 范数下的误差}
+                    \label{$L^2$ 范数下的误差}
+                \end{figure}
+\end{enumerate}
 
 % ===============================================
 
