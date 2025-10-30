@@ -1,0 +1,478 @@
+\documentclass[a4paper]{article}
+\usepackage{ctex}
+\usepackage[affil-it]{authblk}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{bm, mathrsfs}
+\usepackage{pifont}
+\usepackage{graphicx, subcaption}
+
+\usepackage{geometry}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+\addbibresource{citation.bib}
+
+\begin{document}
+% =================================================
+\title{有限元方法 2025 秋冬作业四}
+
+\author{曾申昊 3220100701
+  \thanks{邮箱: \texttt{3097714673@qq.com}
+                            \texttt{或} \texttt{3220100701@zju.edu.cn}}}
+\affil{电子科学与技术 2202，浙江大学 }
+
+
+\date{更新时间: \today}
+
+\maketitle
+
+
+% ============================================
+\section*{1. Sobolev 空间和弱导数的相关性质}
+
+\begin{enumerate}
+    \item[(a)] 取 $\phi \in C_c^{\infty}(-1,1)$，根据定义有
+            \begin{equation}
+                \begin{aligned}
+                    \int_{-1}^{1} u(x) \phi'(x) \text{d}x
+                    &= \int_{-1}^{0} (1+x) \phi'(x) \text{d}x + \int_{0}^{1} (1-x) \phi'(x) \text{d}x\\
+                    &= \Big. (1+x) \phi(x) \Big|_{-1}^{0} - \int_{-1}^{0}1\cdot \phi(x) \text{d}x + \Big. (1-x) \phi(x) \Big|_{0}^{1} - \int_{0}^{1}(-1)\cdot \phi(x) \text{d}x\\
+                    &= -\int_{-1}^{1}u'(x)\phi(x) \text{d}x    
+                \end{aligned}
+            \end{equation}
+    其中定义弱导数 $u'(x) = \begin{cases}1, & x \in (-1,0)\\ -1, & x \in (0,1)\end{cases}$。
+    \item[(b)] 取 $\phi \in C_c^{\infty}(-1,1)$，根据定义有
+            \begin{equation}
+                \begin{aligned}
+                    \int_{-1}^{1} u''(x) \phi(x) \text{d}x
+                    &= -\int_{-1}^{1} u'(x) \phi'(x) \text{d}x\\
+                    &= -\int_{-1}^{0} 1 \cdot \phi'(x) \text{d}x - \int_{0}^{1} (-1) \cdot \phi'(x) \text{d}x\\
+                    &= -\Big. \phi(x) \Big|_{-1}^{0} + \Big. \phi(x) \Big|_{0}^{1}\\
+                    &= -2\phi(0)
+                \end{aligned}
+            \end{equation}
+            利用反证法，现在假设 $u'' \in L^1(-1,1)$，
+            取 $\phi_n \in C_c^{\infty}(-1,1)$ 满足 
+            $\phi_n(0)=1$，支集在 $[-\frac{1}{n},\frac{1}{n}]$上，
+            且 $|\varphi_n|\leq 1$，则有
+            \begin{equation}
+                \int_{-1}^{1} u''(x) \phi_n(x) \text{d}x
+                = - 2\phi_n(0)
+                = -2
+            \end{equation}
+            另一方面，根据积分的绝对连续性，有  
+            \begin{equation}
+                \begin{aligned}
+                    \left|\int_{-1}^{1} u''(x) \phi_n(x) \text{d}x\right|
+                    &\leq \int_{-1}^{1} |u''(x)||\phi_n(x)| \text{d}x\\
+                    &\leq \int_{[-\frac{1}{n},\frac{1}{n}]} |u''(x)| \text{d}x
+                    \to 0
+                \end{aligned}
+            \end{equation}
+            当 $n \to \infty$ 时产生矛盾，因此 $u'' \notin L^2(-1,1)$。
+    \item[(c)] 证明下面二者定义等价：
+            \begin{equation}
+                \begin{cases}
+                    v(x) = v(0) + \displaystyle\int_{0}^{x} v'(t) \text{d}t\\
+                    \displaystyle\int_{0}^{1} (v'(t))^2 \text{d}t < \infty\\
+                    v'(x) = \displaystyle\lim_{h \to 0}\frac{v(x+h) - v(x)}{h}
+                \end{cases}
+                \Longleftrightarrow 
+                \quad
+                \begin{cases}
+                    \displaystyle\int_{0}^{1} (v(t))^2 \text{d}t < \infty\\
+                    \displaystyle\int_{0}^{1} (v'(t))^2 \text{d}t < \infty\\
+                    \displaystyle\int_{0}^{1} v'(t) \phi(t) \text{d}t 
+                    = -\displaystyle\int_{0}^{1} v(t) \phi'(t) \text{d}t
+                \end{cases}
+            \end{equation}
+            \begin{itemize}
+                \item “$\Rightarrow$”\\
+                    根据 Minkowski 不等式和 Cauchy-Schwarz 不等式，有
+                    \begin{equation}
+                        \begin{aligned}
+                            \Vert v(x) \Vert_{L^2(0,1)}
+                            &\leq \Vert v(x) - v(0) \Vert_{L^2(0,1)} + \Vert v(0) \Vert_{L^2(0,1)}\\
+                            &= \left(\int_{0}^{1}\left(\int_{0}^{t} v'(s) \text{d}s\right)^2\text{d}t\right)^{\frac{1}{2}}
+                                + |v(0)|\\
+                            &\leq \left(\int_{0}^{1}
+                                \left[
+                                    \int_{0}^{t} (v'(s))^2 \text{d}s
+                                    \cdot \int_{0}^{t} 1^2 \text{d}s
+                                \right]
+                                \text{d}t\right)^{\frac{1}{2}}
+                                + |v(0)|\\
+                            &\leq \left(\int_{0}^{1}
+                                C_0t \  
+                                \text{d}t\right)^{\frac{1}{2}}
+                                + |v(0)|\\
+                            &\leq \sqrt{\frac{C_0}{2}}
+                                + |v(0)| < \infty
+                        \end{aligned}
+                    \end{equation}
+                    另一方面，经典导数 $v'(x)$ 自然满足弱导数定义。
+                \item “$\Leftarrow$”\\
+                    令 $u(x) = \int_{0}^{x}v'(t)\text{d}t$，
+                    则 $u(x)\in \text{AC}[0,1]$ 且 $u'(x) \overset{a.e.}{=} v'(x)$。
+                    令 $w(x)=u(x)-v(x)$，计算 $w(x)$ 的弱导数有
+                    \begin{equation}
+                        \begin{aligned}
+                            \int_{0}^{1} w(x) \phi'(x) \text{d}x
+                            &= \int_{0}^{1} (u(x)-v(x)) \phi'(x) \text{d}x\\
+                            &= \int_{0}^{1} u(x) \phi'(x) \text{d}x - \int_{0}^{1} v(x) \phi'(x) \text{d}x\\    
+                            &= -\int_{0}^{1} u'(x) \phi(x) \text{d}x + \int_{0}^{1} v'(x) \phi(x) \text{d}x\\
+                            &= 0
+                        \end{aligned}
+                    \end{equation}
+                    由于 $\phi(x)$ 的任意性可得， $w'(x)\overset{a.e.}{=} 0$，即
+                    $w(x) \overset{a.e.}{=} C$。因此有 $w(x)\in \text{AC}[0,1]$，
+                    故 $v(x) = u(x) - w(x)$ 也是绝对连续函数，其经典导数几乎处处存在。
+            \end{itemize}
+\end{enumerate}
+
+\section*{2. 二维区域 $\Omega$ 上的向量场}
+
+\begin{enumerate}
+    \item[(a)] 
+        \begin{itemize}
+            \item “$\Rightarrow$”\\
+                由 $\varepsilon(\vec{u}) = O$ 可得
+                \begin{equation}
+                    \left\{
+                    \begin{aligned}
+                        \partial_1 u_1 + \partial_1 u_1 &= 0,\\
+                        \partial_2 u_2 + \partial_2 u_2 &= 0,\\
+                        \partial_1 u_2 + \partial_2 u_1 &= 0.
+                    \end{aligned}
+                    \right.
+                \end{equation}
+                由前两个方程可得 $u_1 = f(y)$ 且 $u_2 = g(x)$，将其代入第三个方程可得
+                \begin{equation}
+                    \frac{\text{d}g(x)}{\text{d}x} + \frac{\text{d}f(y)}{\text{d}y} = 0.
+                \end{equation}
+                根据 $x$ 和 $y$ 的独立性可令
+                \begin{equation}
+                    \frac{\text{d}g(x)}{\text{d}x} = a \qquad \frac{\text{d}f(y)}{\text{d}y} = -a
+                \end{equation}
+                其中 $a$ 为常数。由此可得
+                \begin{equation}
+                    \left\{
+                    \begin{aligned}
+                        u_1(x,y) &= -ay + b,\\  
+                        u_2(x,y) &= ax + c,
+                    \end{aligned}
+                    \right.
+                \end{equation}
+                其中 $b,c$ 为常数。
+            \item “$\Leftarrow$”\\
+                将 $\vec{u}(x,y)=(-ay+b,ax+c)$
+                代入 $\varepsilon(\vec{u})_{ij}$ 的定义可得
+                \begin{equation}
+                    \left\{
+                    \begin{aligned}
+                        \varepsilon(\vec{u})_{11} &= \frac{1}{2}(\partial_1 u_1 + \partial_1 u_1) = 0,\\
+                        \varepsilon(\vec{u})_{22} &= \frac{1}{2}(\partial_2 u_2 + \partial_2 u_2) = 0,\\
+                        \varepsilon(\vec{u})_{12} &= \varepsilon(\vec{u})_{21} 
+                        = \frac{1}{2}(\partial_1 u_2 + \partial_2 u_1)
+                        = \frac{1}{2}(a - a) = 0.
+                    \end{aligned}
+                    \right.
+                \end{equation}
+                由此可知 $\varepsilon(\vec{u}) = O$.
+        \end{itemize}
+    \item[(b)]
+        \begin{itemize}
+            \item 预紧集合定义\\
+                $(E,d)$ 是一个 Banach 空间，$S \subset  E$ 被称为是一个预紧集合，
+                如果满足对 $\forall \varepsilon > 0$，
+                $S$ 能被有限个半径为 $\varepsilon$ 的开球覆盖。
+            \item 紧算子定义\\
+                一个算子 $T: E \to F$，
+                其中 $E,F$ 均为 Banach空间，被称为是紧算子的，
+                如果作用于 $E$ 中的单位球得到的像集是预紧的。
+        \end{itemize}
+    \item[(c)] 类似讲义中 Poincaré 不等式的证明过程。
+                假设Korn 不等式不成立，则存在 $\{ \vec{u}_n \} \subset H_0^1(\Omega)$ 满足
+                \begin{equation}
+                    \Vert \vec{u}_n \Vert_{L^2(\Omega)} \geq
+                    n \Vert \varepsilon(\vec{u}_n) \Vert_{L^2(\Omega)}.
+                \end{equation}
+                单位化 $\vec{u}_n$，
+                令 $\vec{v}_n = \frac{\vec{u}_n}{\Vert \vec{u}_n \Vert_{L^2(\Omega)}}$，则有
+                \begin{equation}
+                    \Vert \varepsilon(\vec{v}_n) \Vert_{L^2(\Omega)}
+                    \leq \frac{1}{n} 
+                \end{equation}
+                由此可得 $\vec{v}_n$ 是 $H_0^1(\Omega)$ 中的有界序列，
+                也是 $L^2(\Omega)$ 中的预紧集合。
+                因此存在子列 $\{\vec{v}_{n_k}\}$
+                使得 
+                \begin{gather}
+                    \Vert \vec{v}_{n_k} - \vec{v}\Vert_{L^2(\Omega)} \to 0\\
+                    \Vert \vec{v}_{n_k} - \vec{w}\Vert_{H^1(\Omega)} \to 0
+                \end{gather}
+                并且可知 $v \overset{a.e.}{=} w$。取 $n\to \infty$ 后可以得到
+                $\varepsilon(\vec{v}) = O$，由 (a) 小问可知
+                \begin{equation}
+                    \left\{
+                    \begin{aligned}
+                        v_1(x,y) &= -ay + b,\\  
+                        v_2(x,y) &= ax + c,
+                    \end{aligned}
+                    \right.
+                \end{equation}
+                由于 $\vec{v} \in H_0^1(\Omega)$，所以 $a = b = c = 0$，即 $\vec{v} = O$。
+                这与 $\Vert \vec{v} \Vert_{L^2(\Omega)} = 1$ 矛盾。
+\end{enumerate}
+
+\section*{3. 三角形 $T$ 上 Lagrange 插值的误差估计}
+
+\begin{enumerate}
+    \item[(a)]  写出基于 $T$ 的顶点的一次 Lagrange 插值
+                \begin{equation}
+                    I_T u =  \sum_{i=1}^{3} u(\bm{a_i}) \phi_i
+                \end{equation}
+                利用多点 Taylor 展开式，有
+                \begin{equation}
+                    u(\bm{a_i}) = u(\bm{x}) + \nabla u(\bm{x}) \cdot (\bm{a_i} - \bm{x})
+                    + \int_{0}^{1} (\bm{a_i} - \bm{x})^T \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x}))
+                    (\bm{a_i} - \bm{x})(1-t) \text{d}t
+                \end{equation}
+                将其代入 $I_T u$ 可得
+                \begin{equation}
+                    \begin{aligned}
+                        I_T u 
+                        &=  \sum_{i=1}^{3} u(\bm{a_i}) \phi_i\\
+                        &=  \sum_{i=1}^{3} \left( u(\bm{x}) + \nabla u(\bm{x}) 
+                        \cdot (\bm{a_i} - \bm{x}) + \int_{0}^{1} (\bm{a_i} - \bm{x})^T \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x})) (\bm{a_i} - \bm{x})(1-t) \text{d}t \right) \phi_i\\
+                        &= u(\bm{x}) \sum_{i=1}^{3} \phi_i
+                        + \nabla u(\bm{x}) \cdot \sum_{i=1}^{3} (\bm{a_i} - \bm{x}) \phi_i
+                        + \sum_{i=1}^{3}\phi_i \left( \int_{0}^{1} (\bm{a_i} - \bm{x})^T \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x})) (\bm{a_i
+                        } - \bm{x})(1-t) \text{d}t \right) \\
+                        &=u(\bm{x})+\sum_{i=1}^{3}\phi_i \left( \int_{0}^{1} (\bm{a_i} - \bm{x})^T \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x})) (\bm{a_i
+                        } - \bm{x})(1-t) \text{d}t \right)
+                    \end{aligned}
+                \end{equation}
+                \begin{itemize}
+                    \item 证明 $\Vert u-I_T u  \Vert_{L^p(T)} \leq C_1 h_T^2 |u|_{W^{2,p}(T)}$
+                        \begin{equation}
+                            \begin{aligned}
+                                \Vert u-I_T u  \Vert_{L^p(T)}
+                                &=\left\| \sum_{i=1}^{3}\phi_i \left( \int_{0}^{1
+                                } (\bm{a_i} - \bm{x})^T \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x})) (\bm{a_i
+                                } - \bm{x})(1-t) \text{d}t \right) \right\| _{L^p(T)}\\
+                                &\leq \left\| \sum_{i=1}^{3}\left( \int_{0}^{1
+                                } (\bm{a_i} - \bm{x})^T \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x})) (\bm{a_i
+                                } - \bm{x})(1-t) \text{d}t \right) \right\| _{L^p(T)}\\
+                                &\leq h_T^2\sum_{i=1}^{3}\left( \int_{0}^{1
+                                } \left\|
+                                    \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x})) 
+                                \right\|_{L^p(T)}
+                                (1-t) \text{d}t \right)
+                                \label{3-a-1}
+                            \end{aligned}
+                        \end{equation}
+                        对 $L^p(T)$ 进行估计
+                        \begin{equation}
+                            \begin{aligned}
+                                \left\| \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x})) \right\|_{L^p(T)}
+                                &= \left(\int_{T} \left( \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x})) \right)^p \text{d}\bm{x}\right)^{\frac{1}{p}}\\
+                                &= \left(\int_{T} \left( \nabla^2 u(\bm{z}) \right)^p (1-t)^{-2}\text{d}\bm{z}\right)^{\frac{1}{p}}\\
+                                &= (1-t)^{-\frac{2}{p}}\left(\int_{T} \left( \nabla^2 u(\bm{z}) \right)^p \text{d}\bm{z}\right)^{\frac{1}{p}}
+                                \label{L^p(T)估计}
+                            \end{aligned}
+                        \end{equation}      
+                        将式 (\ref{L^p(T)估计}) 代入式 (\ref{3-a-1}) 可得
+                        \begin{equation}
+                            \begin{aligned}
+                                \Vert u-I_T u  \Vert_{L^p(T)}
+                                &\leq 3h_T^2\left( \int_{0}^{1
+                                } (1-t)^{1-\frac{2}{p}} \text{d}t \right) |u|_{W^{2,p}(T)}\\
+                                &= C_1 h_T^2 |u|_{W^{2,p}(T)}
+                            \end{aligned}
+                        \end{equation}              
+                    \item 证明 $|u-I_T u|_{W^{1,p}(T)} \leq C_2 h_T |u|_{W^{2,p}(T)}$                    
+                        \begin{equation}
+                            \begin{aligned}
+                                \nabla I_T u - \nabla u
+                                &= \nabla \left( \sum_{i=1}^{3}\phi_i \left( \int_{0}^{1
+                                } (\bm{a_i} - \bm{x})^T \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x})) (\bm{a_i
+                                } - \bm{x})(1-t) \text{d}t \right) \right)\\
+                                &= \sum_{i=1}^{3} \nabla \phi_i \left( \int_{0}^{1
+                                } (\bm{a_i} - \bm{x})^T \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x})) (\bm{a_i
+                                } - \bm{x})(1-t) \text{d}t \right)\\
+                                &\quad + \sum_{i=1}^{3}\phi_i 
+                                \nabla \left( \int_{0}^{1
+                                } (\bm{a_i} - \bm{x})^T \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x})) (\bm{a_i
+                                } - \bm{x})(1-t) \text{d}t \right)\\
+                                &= \sum_{i=1}^{3} \nabla \phi_i \left( \int_{0}^{1
+                                } (\bm{a_i} - \bm{x})^T \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x})) (\bm{a_i
+                                } - \bm{x})(1-t) \text{d}t \right)
+                            \end{aligned}
+                        \end{equation}
+                        \begin{equation}
+                            \begin{aligned}
+                                |u-I_T u|_{W^{1,p}(T)}
+                                &= \left\|  \left( \sum_{i=1}^{3}\nabla\phi_i \left( \int_{0}^{1
+                                } (\bm{a_i} - \bm{x})^T \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x})) (\bm{a_i
+                                } - \bm{x})(1-t) \text{d}t \right) \right) \right\| _{L^p(T)}\\
+                                &= \sum_{i=1}^{3}\frac{1}{d_i} \left( \int_{0}^{1
+                                } \lVert \nabla^2 u(\bm{x} + t(\bm{a_i} - \bm{x})) \rVert _{L^p(T)}
+                                (1-t) \text{d}t \right)\\
+                                &\leq \frac{3h_T}{\min\{d_1,d_2,d_3\}}h_T \left( \int_{0}^{1
+                                } (1-t)^{1-\frac{2}{p}} \text{d}t \right) |u|_{W^{2,p}(T)}\\
+                                &= C_2 h_T |u|_{W^{2,p}(T)}
+                            \end{aligned}
+                        \end{equation}
+                \end{itemize}
+    \item[(b)]  $C_1$ 的一个明确上界为
+                \begin{equation}
+                    \begin{aligned}
+                        C_1 &= 3\int_{0}^{1
+                        } (1-t)^{1-\frac{2}{p}} \text{d}t\\
+                        &=\frac{3}{2-\frac{2}{p}}
+                    \end{aligned}
+                \end{equation}
+                当 $\frac{h_T}{\min\{d_1,d_2,d_3\}}$ 较大时，
+                也就是三角形 $T$ 较为扁平时，$C_2$ 较大；
+                反之当 $\frac{h_T}{\min\{d_1,d_2,d_3\}}$ 较小时，
+                也就是三角形 $T$ 较为匀称，即接近等边三角形时，$C_2$ 较小。
+    \item[(c)]  
+                \begin{itemize}
+                    \item 证明 $\Vert u-I_T u\Vert_{L^2(T)} \leq C_3 h^3_T |u|_{H^3(T)}$\\
+                        根据 Bramble-Hilbert 定理有
+                        \begin{equation}
+                            \Vert \hat{u}-\hat{I}_T\hat{u}\Vert_{L^2(\hat{T})} 
+                            \leq \tilde{C}_1 |\hat{u}|_{H^3(\hat{T})}  
+                        \end{equation}
+                        其中 $\hat{T}$ 代表仿射变换后的参考三角形。
+                        根据仿射变换的性质，有
+                        \begin{equation}
+                            \begin{aligned}
+                                \Vert u-I_Tu\Vert_{L^2(T)} 
+                                &=|\det(B)|^{\frac{1}{2}} \Vert \hat{u}-\hat{I}\hat{u}\Vert_{L^2(\hat{T})} \\
+                                &\leq \tilde{C}_1 |\det(B)|^{\frac{1}{2}} |\hat{u}|_{H^3(\hat{T})}\\
+                                &\leq \tilde{C}_1 |\det(B)|^{\frac{1}{2}} \tilde{C}_2 \Vert B\Vert^3 |\det(B)|^{-\frac{1}{2}}|u|_{H^3(T)}\\
+                                &\leq \tilde{C}_1 \tilde{C}_2 \tilde{C}_3^3 h_T^3 |u|_{H^3(T)}
+                            \end{aligned}
+                        \end{equation}
+                        最后一个不等式是因为三角形 $T$ 是形状规则的，
+                        故存在常数 $\tilde{C}_3$ 使得 $\Vert B\Vert \leq \tilde{C}_3 h_T$。
+                        令 $C_3 = \tilde{C}_1 \tilde{C}_2 \tilde{C}_3^3$ 即证毕。
+                        \item 证明 $|u-I_T u|_{H^1(T)} \leq C_4 h^2_T |u|_{H^3(T)}$\\
+                            根据讲义中的 \textbf{Lemma 1.2} 和 \textbf{Lemma 1.3} 有
+                            \begin{equation}
+                                \begin{aligned}
+                                        |v-I_{T}v|_{H^{1}(T)}
+                                        & \leq|\det (B)|^{\frac{1}{2}}\|B^{-1}\||\widehat{v-I_{T}v}|_{H^{1}(\widehat{T})} \\
+                                        & =|\det (B)|^{\frac{1}{2}}\|B^{-1}\||\hat{v}-I_{\widehat{T}}\hat{v}|_{H^1(\widehat{T})} \\
+                                        & =|\det (B)|^{\frac{1}{2}}\|B^{-1}\||\hat{v}-p-I_{\widehat{T}}(\hat{v}-p)|_{H^1(\widehat{T})} \\
+                                        & \leq \tilde{C}_4|\det (B)|^{\frac{1}{2}}\|B^{-1}\|\|\hat{v}-p\|_{H^{3}(\widehat{T})}
+                                \end{aligned}
+                            \end{equation}
+                            根据 $p\in\mathcal{P}_m$ 的任意性，有
+                            \begin{equation}
+                                \begin{aligned}
+                                |v-I_{T}v|_{H^{1}(T)} 
+                                & \leq \tilde{C}_4|\det (B)|^{\frac{1}{2}}\|B^{-1}\||\hat{v}|_{H^{3}(\widehat{T})} \\
+                                & \leq \tilde{C}_4\|B^{-1}\|\|B\|^{3}|v|_{H^{3}(T)} \\
+                                & \leq \tilde{C}_4\left(\frac{h_{\widehat{T}}}{\rho_T}\right)h_{T}^{2}|v|_{H^{3}(T)}.
+                                \end{aligned}
+                            \end{equation}
+                            令 $C_4 = \tilde{C}_4 \frac{h_{\hat{T}}}{\rho_T}$ 即证毕。
+                \end{itemize}
+\end{enumerate}
+
+\section*{4. $\mathbb{R}^2$ 上的空间 $H^k(\mathbb{R}^2)$ 的相关不等式}
+
+\begin{enumerate}
+    \item[(a)] 根据讲义的定义有 $\hat{u}(\omega)
+                = (\mathscr{F}u(\omega))=\int_{\mathbb{R}^n}u(x)e^{-2\pi i \omega \cdot x }\text{d}x$
+                由此可得
+                \begin{equation}
+                    \left\{
+                    \begin{aligned}
+                        |u(x)|_{H^1(\mathbb{R}^2)}
+                        &= \Vert \nabla u(x) \Vert_{L^2(\mathbb{R}^2)}
+                        = 2 \pi \Vert \omega\hat{u}(\omega) \Vert_{L^2(\mathbb{R}^2)}\\
+                        |u(x)|_{H^2(\mathbb{R}^2)}
+                        &= \Vert \nabla^2 u(x) \Vert_{L^2(\mathbb{R}^2)}
+                        = 4 \pi^2 \Vert \omega^2\hat{u}(\omega) \Vert_{L^2(\mathbb{R}^2)}\\
+                    \end{aligned}
+                    \right.
+                \end{equation}
+                \begin{equation}
+                    \left\{
+                    \begin{aligned}
+                        \Vert u(x) \Vert_{L^2(\mathbb{R}^2)} 
+                        &= \Vert \hat{u}(\omega) \Vert_{L^2(\mathbb{R}^2)}\\
+                        \Vert u(x) \Vert_{H^1(\mathbb{R}^2)}
+                        &= \left(
+                            \Vert \hat{u}(\omega) \Vert^2_{L^2(\mathbb{R}^2)}
+                            + \Vert 2 \pi \omega\hat{u}(\omega) \Vert^2_{L^2(\mathbb{R}^2)}
+                        \right)^{\frac{1}{2}}\\
+                        \Vert u(x) \Vert_{H^2(\mathbb{R}^2)}
+                        &= \left(
+                            \Vert \hat{u}(\omega) \Vert^2_{L^2(\mathbb{R}^2)}
+                            + 2\Vert 2 \pi \omega\hat{u}(\omega) \Vert^2_{L^2(\mathbb{R}^2)}
+                            + \Vert 4 \pi^2 \omega^2\hat{u}(\omega) \Vert^2_{L^2(\mathbb{R}^2)}
+                        \right)^{\frac{1}{2}}
+                    \end{aligned}
+                    \right.
+                \end{equation}
+    \item[(b)] 根据 $\Vert u \Vert_{H^2(\mathbb{R}^2)}$ 的定义
+                \begin{equation}
+                    \begin{aligned}
+                        \Vert u(x) \Vert_{H^2(\mathbb{R}^2)}
+                        &= \left(
+                            \Vert \hat{u}(\omega) \Vert^2_{L^2(\mathbb{R}^2)}
+                            + 2\Vert 2 \pi \omega\hat{u}(\omega) \Vert^2_{L^2(\mathbb{R}^2)}
+                            + \Vert 4 \pi^2 \omega^2\hat{u}(\omega) \Vert^2_{L^2(\mathbb{R}^2)}
+                        \right)^{\frac{1}{2}}\\
+                        &= \left(
+                            \int_{\mathbb{R}^2} 
+                            (1+4\pi^2\omega^2)^2
+                            \hat{u}^2(\omega) \text{d}\omega
+                        \right)^{\frac{1}{2}}\\
+                        &=\Vert (1+4\pi^2\omega^2)
+                            \hat{u}(\omega) \Vert_{L^2(\mathbb{R}^2)}\\
+                        &\leq
+                        \Vert \hat{u}(\omega) \Vert_{L^2(\mathbb{R}^2)}
+                        + \Vert 4 \pi^2 \omega^2\hat{u}(\omega) \Vert_{L^2(\mathbb{R}^2)}\\
+                        &= \Vert u(x) \Vert_{L^2(\mathbb{R}^2)}
+                            + |u(x)|_{H^2(\mathbb{R}^2)}
+                    \end{aligned}
+                \end{equation}
+    \item[(c)]  根据 Fourier 逆变换有
+                \begin{equation}
+                    \begin{aligned}
+                        |u(x)| &= \left|\int_{\mathbb{R}^2}
+                            \hat{u}(\omega)e^{2\pi i \omega \cdot x} \text{d}\omega
+                        \right|\\
+                        &\leq \int_{\mathbb{R}^2} |\hat{u}(\omega)|\text{d}\omega\\
+                        &\leq \left(
+                            \int_{\mathbb{R}^2} (1+4\pi^2\omega^2)^{-2} \text{d}\omega
+                        \right)^{\frac{1}{2}}
+                        \cdot
+                        \left(\int_{\mathbb{R}^2} 
+                            (1+4\pi^2\omega^2)^2
+                            \hat{u}^2(\omega) \text{d}\omega
+                        \right)^{\frac{1}{2}}\\
+                        &= C \Vert u(x) \Vert_{H^2(\mathbb{R}^2)}
+                    \end{aligned}
+                \end{equation}
+                两边取最大值可得
+                \begin{equation}
+                    \Vert u(x) \Vert_{L^{\infty}(\mathbb{R}^2)}
+                    \leq C \Vert u(x) \Vert_{H^ 2(\mathbb{R}^2)}
+                \end{equation}
+\end{enumerate}
+
+% ===============================================
+
+\printbibliography
+
+\end{document}
