@@ -1,0 +1,296 @@
+\documentclass[a4paper]{article}
+\usepackage{ctex}
+\usepackage[affil-it]{authblk}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{bm, mathrsfs, pifont}
+\usepackage{graphicx, geometry, subcaption}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+\addbibresource{citation.bib}
+
+\begin{document}
+% =================================================
+\title{有限元方法 2025 秋冬作业五}
+
+\author{曾申昊 3220100701
+  \thanks{邮箱: \texttt{3097714673@qq.com}
+                            \texttt{或} \texttt{3220100701@zju.edu.cn}}}
+\affil{电子科学与技术 2202，浙江大学 }
+
+
+\date{更新时间: \today}
+
+\maketitle
+
+
+% ============================================
+\section*{1. $\mathcal{P}_3$ 有限元空间的构造与编程}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics{image/image_Problem1.pdf}
+    \caption{$\mathcal{P}_3$ 有限元空间单位三角形}
+    \label{fig: P_3 有限元空间单位三角形}
+\end{figure}
+
+\begin{enumerate}
+    \item[(a)] 对于 $\mathcal{P}_3$ 有限元空间，可以将点分为顶点、
+    边上三等分点和内部点三种，如图 \ref{fig: P_3 有限元空间单位三角形} 所示。
+    对于顶点，以 $a_1$ 为例进行计算，由几何关系可由 $\mathcal{P}_1$ 空间的基函数
+    $\lambda_1,\lambda_2,\lambda_3$ 构造出满足约束条件的基函数
+    \begin{equation}
+        \psi_1 = c\lambda_1(3\lambda_1 - 1)(3\lambda_1 - 2)
+    \end{equation}
+    代入约束条件 $\psi_1(a_1) = 1$，解得 $c = \frac{1}{2}$，利用同样的思路可以得到
+    \begin{equation}
+        \left\{
+            \begin{aligned}
+                \psi_i &= \frac{1}{2}\lambda_1(3\lambda_i - 1)(3\lambda_i - 2) \qquad i = 1,2,3\\
+                \psi_4 &= 9\lambda_1\lambda_2(3\lambda_1 - 1) \\
+                \vdots\\
+                \psi_9 &= 9\lambda_1\lambda_3(3\lambda_1 - 1) \\
+                \psi_{10} &= 27\lambda_1\lambda_2\lambda_3
+            \end{aligned}
+        \right.
+    \end{equation}
+    \item[(b)] 显然 $\dim\ V_h$ 对应了基函数的个数，每个顶点对应一个基函数，
+    每条边对应两个基函数，内部对应一个基函数，因此
+    \begin{equation}
+        \dim\ V_h = \#\mathcal{N}_h^I + 2\#\mathcal{E}_h^I + \#\mathcal{T}_h
+    \end{equation}
+    $V_h$ 的一组基函数已经在 (a) 小问中给出。
+    \item[(c)] $\mathcal{P}_3$ 有限元程序的结果
+                如图 \ref{fig: $h=0.5$ 时有限元解的图像} 和图 \ref{fig: $h=0.5$ 时有限元解的误差} 所示。
+            \begin{figure}
+                \centering
+                \begin{subfigure}{0.25\textwidth}
+                    \centering
+                    \includegraphics[width=\textwidth]
+                            {../../Programming/Cubic Finite Element Methods/image/mesh.pdf}
+                    \caption{网格}
+                \end{subfigure}
+                \begin{subfigure}{0.35\textwidth}
+                    \centering
+                    \includegraphics[width=\textwidth]
+                            {../../Programming/Cubic Finite Element Methods/image/pic1FEM_0.25.pdf}
+                    \caption{云图}
+                \end{subfigure}
+                \begin{subfigure}{0.35\textwidth}
+                    \centering
+                    \includegraphics[width=\textwidth]
+                            {../../Programming/Cubic Finite Element Methods/image/pic2FEM_0.25.pdf}
+                    \caption{三维图}
+                \end{subfigure}
+                \caption{$h=0.5$ 时有限元解的图像}
+                \label{fig: $h=0.5$ 时有限元解的图像}
+            \end{figure}
+            \begin{figure}
+                \centering
+                \begin{subfigure}{0.4\textwidth}
+                    \centering
+                    \includegraphics[width=\textwidth]
+                            {../../Programming/Cubic Finite Element Methods/image/rateH1norm.pdf}
+                    \caption{$H^1$ 范数下的误差}
+                \end{subfigure}
+                \begin{subfigure}{0.4\textwidth}
+                    \centering
+                    \includegraphics[width=\textwidth]
+                            {../../Programming/Cubic Finite Element Methods/image/rateL2norm.pdf}
+                    \caption{$L^2$ 范数下的误差}
+                \end{subfigure}
+                \caption{$h=0.5$ 时有限元解的误差}
+                \label{fig: $h=0.5$ 时有限元解的误差}
+            \end{figure}
+\end{enumerate}
+
+\section*{2. Hermite 有限元空间的构造与分析}
+
+\begin{enumerate}
+    \item[(a)] 根据 Hermite 有限元空间定义
+        \begin{equation}
+            V_h = 
+            \{ v \in C^1(0,1) : \big. v\big|_{(x_i,x_{i+1})} \in \mathcal{P}_3(K), 
+            \ i = 0,1,\cdots,N \}
+        \end{equation}
+        考虑区间 $(x_i,x_{i+1})$ 上的插值算子 $\phi_i\in \mathcal{P}_3$，
+        其基函数 $\{H_{i,1},H_{i,2},H_{i,3},H_{i,4}\}$ 满足的约束为
+        \begin{equation}
+            \begin{cases}
+                H_{i,1}(x_i) = 1 \\
+                H_{i,1}'(x_i) = 0 \\
+                H_{i,1}(x_{i+1}) = 0 \\
+                H_{i,1}'(x_{i+1}) = 0
+            \end{cases}
+            \begin{cases}
+                H_{i,2}(x_i) = 0 \\
+                H_{i,2}'(x_i) = 1 \\
+                H_{i,2}(x_{i+1}) = 0 \\
+                H_{i,2}'(x_{i+1}) = 0
+            \end{cases}
+            \begin{cases}
+                H_{i,3}(x_i) = 0 \\
+                H_{i,3}'(x_i) = 0 \\
+                H_{i,3}(x_{i+1}) = 1 \\
+                H_{i,3}'(x_{i+1}) = 0
+            \end{cases}
+            \begin{cases}
+                H_{i,4}(x_i) = 0 \\
+                H_{i,4}'(x_i) = 0 \\
+                H_{i,4}(x_{i+1}) = 0 \\
+                H_{i,4}'(x_{i+1}) = 1
+            \end{cases}
+        \end{equation}
+        以 $H_{i,1}$ 为例进行计算，由于 $H_{i,1}(x_{i+1}) = H_{i,1}'(x_{i+1}) = 0$，
+        设 $H_{i,1}=(x-x_{i+1})^2(\alpha x + \beta)$，代入约束方程得到
+        \begin{equation}
+            \begin{cases}
+                (x_i-x_{i+1})^2(\alpha x_i + \beta) = 1\\
+                2(x_i-x_{i+1})(\alpha x_i + \beta) + (x_i-x_{i+1})^2 \alpha = 0
+            \end{cases}
+        \end{equation}
+        解得
+        \begin{equation}
+            \begin{cases}
+                \alpha = \dfrac{2}{h_i^3} \\ 
+                \beta = -\dfrac{x_{i+1}+x_i}{h_i^3}
+            \end{cases}
+            \quad 
+            \text{其中} \ h_i = x_{i+1}-x_i
+        \end{equation}
+        对其他基函数进行类似计算，整理得到
+        \begin{equation}
+            \begin{cases}
+                H_{i,1} = \dfrac{1}{h_i^3}(2x - x_{i+1}-x_i)(x-x_{i+1})^2\\
+                H_{i,2} = \dfrac{1}{h_i^2}(x - x_i)(x-x_{i+1})^2\\
+                H_{i,3} = \dfrac{1}{h_i^3}(x-x_i)^2(2x - x_{i+1}-x_i)\\
+                H_{i,4} = \dfrac{1}{h_i^2}(x - x_i)^2(x-x_{i+1})
+            \end{cases}
+        \end{equation}
+        由此可见，Hermite 有限元空间 
+        $V_h=\text{span} \Big\{H_{0,1},H_{0,2},H_{0,3},H_{0,4}, \cdots, H_{N,1},H_{N,2},H_{N,3},H_{N,4}\Big\}$ 。
+    \item[(b)] 由 (a) 小问可得，区间 $(x_i,x_{i+1})$ 上的插值算子可表示为
+        \begin{equation}
+            \Big.I_h (v)\Big|_{(x_i,x_{i+1})} 
+            = v(x_i)H_{i,1} + v'(x_i)H_{i,2} + v(x_{i+1})H_{i,3} + v'(x_{i+1})H_{i,4}
+        \end{equation}
+    \item[(c)] 该问题的有限元方法可以由以下推导得到
+        \begin{equation}
+            \begin{gathered}
+                \int_{0}^{1} u'''' v\text{d}x = \int_{0}^{1} f v \text{d}x\\
+                \Big.u'''v\Big|_0^1-\int_{0}^{1} u''' v'\text{d}x = \int_{0}^{1} f v \text{d}x
+            \end{gathered}
+        \end{equation}
+        考虑 $v(0)=v(1)=0$，继续推导
+        \begin{equation}
+            \begin{gathered}
+                -\int_{0}^{1} u''' v'\text{d}x = \int_{0}^{1} f v \text{d}x\\
+                -\Big.u''v'\Big|_0^1+\int_{0}^{1} u'' v''\text{d}x = \int_{0}^{1} f v \text{d}x\\
+            \end{gathered}
+        \end{equation}
+        考虑 $v'(0)=v'(1)=0$ ，最终得到该问题的弱形式为
+        \begin{equation}
+            \int_{0}^{1} u'' v''\text{d}x = \int_{0}^{1} f v \text{d}x
+        \end{equation}
+            由 Céa 引理知 $|u-u_h|_{H^2(0,1)} \leq \dfrac{\alpha}{\beta} |u - I_h u|_{H^2(0,1)}$，
+            因此我们只需证明 $|u-I_h u|_{H^2(0,1)} \leq C_1 h^2 |u|_{H^4(0,1)}$，
+            下面的证明中我们先观察区间 $(x_i,x_{i+1})$ 上的 $u(x)$
+        \begin{equation}
+            \begin{cases}
+                u(x_i) = u(x) + u'(x)(x_i - x)  
+                        + \dfrac{1}{2}u''(x)(x_i - x)^2
+                        + \dfrac{1}{6}u'''(x)(x_i - x)^3 + \dfrac{1}{6} \displaystyle\int_{x}^{x_i} u''''(t)(x_i - t)^3 \text{d}t\\
+                u'(x_i) = u'(x) + u''(x)(x_i - x) 
+                        + \dfrac{1}{2}u'''(x)(x_i - x)^2 + \dfrac{1}{2}\displaystyle\int_{x}^{x_i} u''''(t)(x_i - t)^2 \text{d}t\\
+                u(x_{i+1}) = u(x) + u'(x)(x_{i+1} - x) 
+                        + \dfrac{1}{2}u''(x)(x_{i+1} - x)^2 + \dfrac{1}{6}u'''(x)(x_{i+1} - x)^3 + \dfrac{1}{6} \displaystyle\int_{x}^{x_{i+1}} u''''(t)(x_{i+1} - t)^3 \text{d}t\\
+                u'(x_{i+1}) = u'(x) + u''(x)(x_{i+1} - x) 
+                        + \dfrac{1}{2}u'''(x)(x_{i+1} - x)^2 + \dfrac{1}{2}\displaystyle\int_{x}^{x_{i+1}} u''''(t)(x_{i+1} - t)^2 \text{d}t\\
+            \end{cases}
+        \end{equation}
+        代入插值算子表达式，整理得到
+        \begin{equation}
+            \begin{aligned}
+                I_h (u) =&\ u(x_i)H_{i,1} + u'(x_i)H_{i,2} + u(x_{i+1})H_{i,3} + u'(x_{i+1})H_{i,4}\\
+                =&\ u(x)\left[H_{i,1} + H_{i,3}\right]
+                    + u'(x)\left[(x_i-x)H_{i,1} + H_{i,2} + (x_{i+1}-x)H_{i,3} + H_{i,4}\right]\\
+                 &\ + u''(x)\left[\frac{1}{2}(x_i-x)^2H_{i,1} + (x_i-x)H_{i,2} + \frac{1}{2}(x_{i+1}-x)^2H_{i,3} + (x_{i+1}-x)H_{i,4}\right]\\
+                 &\ + u'''(x)\left[\frac{1}{6}(x_i-x)^3H_{i,1} + \frac{1}{2}(x_i-x)^2H_{i,2} + \frac{1}{6}(x_{i+1}-x)^3H_{i,3} + \frac{1}{2}(x_{i+1}-x)^2H_{i,4}\right]\\
+                 &\ + H_{i,1}g_{i,1} + H_{i,2}g_{i,2} + H_{i,3}g_{i,3} + H_{i,4}g_{i,4}\\
+                =&\ u(x) + \sum_{j=1}^{4} H_{i,j} g_{i,j}
+            \end{aligned}
+        \end{equation}
+        其中 $g_{i,j}$ 为积分余项，下面可以计算 $|u - I_h u|_{H^2(0,1)}$
+        我们不难得到等式
+        \begin{equation}
+            \begin{aligned}
+                \left|u'' - (I_h u)''\right| 
+                = \left|\sum_{j=1}^{4} (H_{i,j} g_{i,j})''\right|
+                &= \left|\sum_{j=1}^{4} \left(H'_{i,j} g_{i,j} + H_{i,j} g'_{i,j}\right)'\right|
+                = \left|\sum_{j=1}^{4} \left(H'_{i,j} g_{i,j}\right)'\right|\\
+                &= \left|\sum_{j=1}^{4} H''_{i,j} g_{i,j} + H_{i,j} g'_{i,j}\right|
+                = \left|\sum_{j=1}^{4} H''_{i,j} g_{i,j}\right|\\
+            \end{aligned}
+        \end{equation}
+        然后我们可以对误差进行估计
+        \begin{equation}
+            \begin{aligned}
+                \left|u'' - (I_h u)''\right| 
+                \leq \sum_{j=1}^{4} \left|H''_{i,j} g_{i,j}\right|
+                &= \sum_{j=1,3}\left|H''_{i,j} g_{i,j}\right| 
+                    + \sum_{j=2,4}\left|H''_{i,j} g_{i,j}\right|\\
+                    &\leq \tilde{B}_1\sum_{j=1,3}\left|\dfrac{1}{h_i^2} \int_{x}^{x_{i+1}} |u''''(t)|h_i^3\text{d}t\right| 
+                    + \tilde{B}_2\sum_{j=2,4}\left|\dfrac{1}{h_i} \int_{x}^{x_{i+1}} |u''''(t)|h_i^2\text{d}t\right|\\
+                    &\leq \tilde{C}_1 h_i^2 |u''''|\\
+            \end{aligned}
+        \end{equation}
+        取 $h=\max h_i$，两边平方并积分可得结论。
+\end{enumerate}
+
+\section*{3. 双调和方程的有限元方法}
+
+\par 该问题的有限元方法可以由以下推导得到
+    \begin{equation}
+        \begin{gathered}
+            \int_{\Omega} (\Delta^2 u) v\text{d}S = \int_{\Omega} f v \text{d}S\\
+            \int_{\Omega} \left[\nabla \cdot \nabla(\Delta u)\right] v\text{d}S = \int_{\Omega} f v \text{d}S\\
+            \int_{\Omega} \nabla \cdot \left[v\nabla(\Delta u)\right] \text{d}S
+            -\int_{\Omega} \nabla(\Delta u) \cdot \nabla v\text{d}S = \int_{\Omega} f v \text{d}S\\
+            \int_{\partial\Omega} \vec{n} \cdot \left[v\nabla(\Delta u)\right] \text{d}l
+            -\int_{\Omega} \nabla(\Delta u) \cdot \nabla v\text{d}S = \int_{\Omega} f v \text{d}S\\
+        \end{gathered}
+    \end{equation}
+\par 考虑 $v$ 在边界 $\partial \Omega$ 上的值为零，继续推导
+    \begin{equation}
+        \begin{gathered}
+            -\int_{\Omega} \nabla(\Delta u) \cdot \nabla v\text{d}S = \int_{\Omega} f v \text{d}S\\
+            -\int_{\Omega} \nabla \cdot (\Delta u \nabla v)\text{d}S 
+            + \int_{\Omega} \Delta u (\nabla \cdot \nabla v)\text{d}S = \int_{\Omega} f v \text{d}S\\
+            -\int_{\partial\Omega} \vec{n} \cdot (\Delta u \nabla v)\text{d}l
+            + \int_{\Omega} \Delta u \Delta v\text{d}S = \int_{\Omega} f v \text{d}S\\
+            -\int_{\partial\Omega} \Delta u \frac{\partial v}{\partial n}\text{d}l
+            + \int_{\Omega} \Delta u \Delta v\text{d}S = \int_{\Omega} f v \text{d}S
+        \end{gathered}
+    \end{equation}
+\par 考虑 $v$ 在边界 $\partial \Omega$ 上的法向导数也为零，最终得到该问题的弱形式为
+    \begin{equation}
+        \int_{\Omega} \Delta u \Delta v\text{d}S = \int_{\Omega} f v \text{d}S
+    \end{equation}
+
+\par 利用 $u$ 的光滑性交换求导指标，然后利用紧支集的性质，
+    分部积分后产生的边界项在无穷远处消失，可以验证得到
+    \begin{equation}
+        \int_{\Omega} \Delta u \Delta v\text{d}S = \int_{\Omega} \nabla^2 u : \nabla^2 v\text{d}S
+    \end{equation}
+
+% ===============================================
+
+\printbibliography
+
+\end{document}
