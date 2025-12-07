@@ -11,15 +11,15 @@ f = @(x) 24*(x(:,1).^2 .* (1-x(:,1)).^2 + x(:,2).^2 .* (1-x(:,2)).^2) ...
 allnode = getallnode(node, edge, elem2dof);
 
 %% Draw picture of mesh
-if h >= pow2(-2)
-    figure(1);
-    hold on;
-    axis on;
-    showmesh(node, elem);
-    findelem(node, elem);       % plot indices of all triangles
-    findnode(node);             % plot indices of all vertices
-    findedgedof(node, edge);    % plot indices of all edge
-end
+% if h >= pow2(-2)
+%     figure(1);
+%     hold on;
+%     axis on;
+%     showmesh(node, elem);
+%     findelem(node, elem);       % plot indices of all triangles
+%     findnode(node);             % plot indices of all vertices
+%     findedgedof(node, edge);    % plot indices of all edge
+% end
 %% Draw picture of FEM
 plotsolution(node, elem, elem2dof, u_h);
 
