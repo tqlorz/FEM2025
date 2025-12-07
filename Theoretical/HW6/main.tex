@@ -1,0 +1,349 @@
+\documentclass[a4paper]{article}
+\usepackage{ctex}
+\usepackage[affil-it]{authblk}
+\usepackage[backend=bibtex,style=numeric]{biblatex}
+\usepackage{amsmath,amsthm,amssymb,amsfonts}
+\usepackage{bm, mathrsfs}
+\usepackage{pifont}
+\usepackage{graphicx, subcaption}
+
+\usepackage{geometry}
+\geometry{margin=1.5cm, vmargin={0pt,1cm}}
+\setlength{\topmargin}{-1cm}
+\setlength{\paperheight}{29.7cm}
+\setlength{\textheight}{25.3cm}
+
+\addbibresource{citation.bib}
+
+\begin{document}
+% =================================================
+\title{有限元方法 2025 秋冬作业六}
+
+\author{曾申昊 3220100701
+  \thanks{邮箱: \texttt{3097714673@qq.com}
+                            \texttt{或} \texttt{3220100701@zju.edu.cn}}}
+\affil{电子科学与技术 2202，浙江大学 }
+
+
+\date{更新时间: \today}
+
+\maketitle
+
+
+% ============================================
+\section*{1. Morley 有限元的分析与编程}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.5\textwidth]{image/image_Problem1.pdf}
+    \caption{Morley 单位元示意图}
+    \label{fig: Morley 单位元示意图}
+\end{figure}
+
+\begin{enumerate}
+    \item[(a)] Morley 元$(\mathcal{T},\mathcal{P}_2,\mathcal{N}_M)$
+                的自由度为6个，包括三角形单元的三个顶点处的函数值 $u(\bm{x_i})$ 
+                以及三个边中点处的法向导数 $\frac{\partial u}{\partial n_i}(\bm{m_i})$，
+                如图 \ref{fig: Morley 单位元示意图} 所示。
+                定义 Morley 元的基函数 $\{\phi_i\}_{i=1}^{6}$ 满足
+                \begin{equation}
+                    \begin{cases}
+                        \phi_i(\bm{x_j})=\delta_{ij} & j=1,2,3 \\
+                        \dfrac{\partial \phi_i}{\partial n_j}(\bm{m_j})=0 & j=1,2,3
+                    \end{cases}
+                    \qquad i=1,2,3
+                \end{equation}
+                \begin{equation}
+                    \begin{cases}
+                        \phi_{i+3}(\bm{x_j})=0 & j=1,2,3 \\
+                        \dfrac{\partial \phi_{i+3}}{\partial n_j}(\bm{m_j})=\delta_{ij} & j=1,2,3
+                    \end{cases}
+                    \qquad i=1,2,3
+                \end{equation}
+                于是 Morley 元插值 $I_T$ 可以表示为
+                \begin{equation}
+                    I_T(u)=\sum_{i=1}^{3} u(\bm{x_i})\phi_i
+                    +\sum_{i=1}^{3} \frac{\partial u}{\partial n_i}(\bm{m_i})\phi_{i+3}
+                \end{equation}
+    \item[(b)] 下面的证明中我们先观察单位元上的 $u(x)$
+                \begin{equation}
+                    \left\{
+                    \begin{aligned}
+                        &u(\bm{x_i}) = u(\bm{x}) + (\bm{x_i} - \bm{x})^T \nabla u(\bm{x})  
+                                + \dfrac{1}{2}(\bm{x_i} - \bm{x})^T\nabla^2 u(\bm{x})(\bm{x_i} - \bm{x})  
+                                + R(\bm{x_i})\\
+                        &R(\bm{x_i})=\dfrac{1}{2} \displaystyle\int_{0}^{1} 
+                                g'''(t;\bm{x_i})(1-t)^2\text{d}t\\
+                        &g'''(t;\bm{x_i})=\displaystyle\sum_{|\alpha|=3} 
+                                \dfrac{\partial^3u}{\partial x^{\alpha}} 
+                                u(\bm{x}+t(\bm{x_i}-\bm{x}))(\bm{x_i}-\bm{x})^{\alpha}\\
+                    \end{aligned}
+                    \right.
+                \end{equation}
+                \begin{equation}
+                    \left\{
+                    \begin{aligned}
+                        &\nabla u(\bm{m_i}) = \nabla u(\bm{x})  
+                                + \nabla^2 u(\bm{x})(\bm{m_i} - \bm{x})  
+                                + \nabla R(\bm{m_i})\\
+                        &\frac{\partial u}{\partial n_i}(\bm{m_i}) = \bm{n_i}^T \nabla u(\bm{x})  
+                                + \bm{n_i}^T \nabla^2 u(\bm{x})(\bm{m_i} - \bm{x})  
+                                + \bm{n_i}^T \nabla R(\bm{m_i})\\
+                    \end{aligned}
+                    \right.
+                \end{equation}
+                代入插值算子表达式，整理得到
+                \begin{equation}
+                    \begin{aligned}
+                        I_T (u) 
+                        =&\ \sum_{i=1}^{3} u(\bm{x_i})\phi_i
+                            +\sum_{i=1}^{3} \frac{\partial u}{\partial n_i}(\bm{m_i})\phi_{i+3}\\
+                        =&\ u(x) \left(\sum_{i=1}^{3} \phi_i\right)
+                            + \nabla u(\bm{x}) \cdot \left(\sum_{i=1}^{3} (\bm{x_i}-\bm{x})\phi_i
+                            + \sum_{i=1}^{3} \bm{n_i}\phi_{i+3}\right)\\
+                        &+ \dfrac{1}{2} \nabla^2 u(\bm{x}) : \left(\sum_{i=1}^{3} 
+                            (\bm{x_i}-\bm{x})(\bm{x_i}-\bm{x})^T \phi_i
+                            + \sum_{i=1}^{3} \bm{n_i}(\bm{m_i}-\bm{x})^T \phi_{i+3}\right)\\
+                        &+ \sum_{i=1}^{3} R(\bm{x_i})\phi_i
+                            + \sum_{i=1}^{3} \bm{n_i}^T \nabla R(\bm{m_i}) \phi_{i+3}\\
+                        =&\ u(x) + \sum_{i=1}^{3} R(\bm{x_i})\phi_i
+                            + \sum_{i=1}^{3} \bm{n_i}^T \nabla R(\bm{m_i}) \phi_{i+3}\\
+                    \end{aligned}
+                \end{equation}
+                下面可以计算 $|u - I_T u|_{H^2(T)}$
+                我们可以验证等式
+                \begin{equation}
+                    \begin{aligned}
+                        \left|\nabla^2u - \nabla^2(I_T u)\right| 
+                        = &\left|\nabla^2
+                            \left(\sum_{i=1}^{3} R(\bm{x_i})\phi_i 
+                            + \sum_{i=1}^{3} \bm{n_i}^T \nabla R(\bm{m_i})\phi_{i+3}\right)
+                            \right|\\
+                        = &\left|\sum_{i=1}^{3} R(\bm{x_i}) \nabla^2 \phi_i  
+                            + \sum_{i=1}^{3} \bm{n_i}^T \nabla R(\bm{m_i}) \nabla^2 \phi_{i+3} 
+                            \right|\\
+                    \end{aligned}
+                \end{equation}
+                然后我们可以对误差进行估计
+                \begin{equation}
+                    \begin{aligned}
+                        \left|\nabla^2u - \nabla^2(I_T u)\right| 
+                        \leq &\sum_{i=1}^{3} \left|R(\bm{x_i}) \nabla^2 \phi_i \right|
+                            + \sum_{i=1}^{3} \left|\bm{n_i}^T \nabla R(\bm{m_i}) \nabla^2 \phi_{i+3} \right|\\
+                        \leq &\tilde{C}_1\sum_{i=1}^{3} \left|h_T^3\nabla^3u\cdot \frac{1}{h_T^2} \right|
+                            + \tilde{C}_2\sum_{i=1}^{3} \left|h_T\cdot h_T^2\nabla^3u\cdot \frac{1}{h_T^2}\right|\\
+                        \leq &\tilde{C} h_T |\nabla^3u|\\
+                    \end{aligned}
+                \end{equation}
+                两边平方并积分可得结论。
+    \item[(c)]  令 $\phi_i=a\lambda_1^2+b\lambda_2^2+c\lambda_3^2
+                    +d\lambda_1\lambda_2+e\lambda_1\lambda_3+f\lambda_2\lambda_3$。
+                以 $\phi_1$ 为例进行计算，$\phi_2$ 和 $\phi_3$ 类似。
+                \begin{equation}
+                    \begin{cases}
+                        \phi_1(\bm{x_j})=\delta_{1j} & j=1,2,3 \\
+                        \dfrac{\partial \phi_1}{\partial n_j}(\bm{m_j})=0 & j=1,2,3
+                    \end{cases}
+                \end{equation}
+                由前三个方程可设 $\phi_1=\lambda_1^2
+                    +d\lambda_1\lambda_2+e\lambda_1\lambda_3+f\lambda_2\lambda_3$，
+                并且要记得
+                \begin{equation}
+                    \begin{cases}
+                        \nabla\phi_1=2\lambda_1\nabla\lambda_1
+                        +d\left(\lambda_1\nabla\lambda_2+\lambda_2\nabla\lambda_1\right)
+                        +e\left(\lambda_1\nabla\lambda_3+\lambda_3\nabla\lambda_1\right)
+                        +f\left(\lambda_2\nabla\lambda_3+\lambda_3\nabla\lambda_2\right)\\
+                        \dfrac{\partial \phi_1}{\partial n_j}(\bm{m_j})=\bm{n_j}\cdot\nabla\phi_1(\bm{m_j} ) \qquad j=1,2,3
+                    \end{cases}
+                \end{equation}
+                \begin{equation}
+                    \begin{cases}
+                        \nabla\lambda_i=-\dfrac{\bm{n_i}}{d_i} \qquad i=1,2,3\\
+                        \nabla\lambda_1 + \nabla\lambda_2 + \nabla\lambda_3 =0
+                    \end{cases}
+                \end{equation}
+                代入后三个方程进行计算
+                \begin{equation}
+                    \begin{cases}
+                        \bm{n_1}\cdot\big[
+                            d\left(0.5\nabla\lambda_1\right)
+                            +e\left(0.5\nabla\lambda_1\right)
+                            +f\left(0.5\nabla\lambda_3+0.5\nabla\lambda_2\right)
+                            \big]=0\\
+                        \bm{n_2}\cdot\big[
+                            \nabla\lambda_1
+                            +d\left(0.5\nabla\lambda_2\right)
+                            +e\left(0.5\nabla\lambda_3+0.5\nabla\lambda_1\right)
+                            +f\left(0.5\nabla\lambda_2\right)
+                        \big]=0\\
+                        \bm{n_3}\cdot\big[
+                            \nabla\lambda_1
+                            +d\left(0.5\nabla\lambda_2+0.5\nabla\lambda_1\right)
+                            +e\left(0.5\nabla\lambda_3\right)
+                            +f\left(0.5\nabla\lambda_3\right)
+                        \big]=0\\
+                    \end{cases}
+                \end{equation}
+                解得
+                \begin{equation}
+                    \left\{
+                    \begin{aligned}
+                        d&=-\dfrac{d_2}{d_1}\bm{n_2}\cdot\bm{n_1}
+                            =-d_2^2 \nabla \lambda_2 \cdot \nabla \lambda_1\\
+                        e&=-\dfrac{d_3}{d_1}\bm{n_3}\cdot\bm{n_1}  
+                            =-d_3^2 \nabla \lambda_3 \cdot \nabla \lambda_1\\
+                        f&=-\left(\dfrac{d_2}{d_1}\bm{n_2} 
+                            + \dfrac{d_3}{d_1}\bm{n_3}\right)\cdot \bm{n_1}
+                            =-\left(d_2^2\nabla \lambda_2 
+                            + d_3^2\nabla \lambda_3\right)\cdot \nabla \lambda_1\\
+                    \end{aligned}
+                    \right.
+                \end{equation}
+                以 $\phi_4$ 为例进行计算，$\phi_5$ 和 $\phi_6$ 类似。
+                \begin{equation}
+                    \begin{cases}
+                        \phi_4(\bm{x_j})=0 & j=1,2,3 \\
+                        \dfrac{\partial \phi_4}{\partial n_j}(\bm{m_j})=\delta_{1j} & j=1,2,3
+                    \end{cases}
+                \end{equation}
+                由前三个方程可设 
+                $\phi_4=d\lambda_1\lambda_2+e\lambda_1\lambda_3+f\lambda_2\lambda_3$
+                代入后三个方程进行计算
+                \begin{equation}
+                    \begin{cases}
+                        \bm{n_1}\cdot\big[
+                            d\left(0.5\nabla\lambda_1\right)
+                            +e\left(0.5\nabla\lambda_1\right)
+                            +f\left(0.5\nabla\lambda_3+0.5\nabla\lambda_2\right)
+                            \big]=1\\
+                        \bm{n_2}\cdot\big[
+                            d\left(0.5\nabla\lambda_2\right)
+                            +e\left(0.5\nabla\lambda_3+0.5\nabla\lambda_1\right)
+                            +f\left(0.5\nabla\lambda_2\right)
+                        \big]=0\\
+                        \bm{n_3}\cdot\big[
+                            d\left(0.5\nabla\lambda_2+0.5\nabla\lambda_1\right)
+                            +e\left(0.5\nabla\lambda_3\right)
+                            +f\left(0.5\nabla\lambda_3\right)
+                        \big]=0\\
+                    \end{cases}
+                \end{equation}
+                解得 $d=e=-d_1$ 和 $f=0$。
+        \item[(d)] 这里选取如下的 $f$ 和对应的解析解
+                \begin{equation}
+                    \begin{cases}
+                        f(x,y) = 24\left(x^2(1-x)^2+y^2(1-y)^2\right)+8(1-6x+6x^2)(1-6y+6y^2)\\
+                        u(x,y) = x^2(1-x)^2 y^2(1-y)^2\\
+                    \end{cases}
+                \end{equation}
+                数值解图像如图所示（不正确，误差估计没有做）
+                \begin{figure}[htbp]
+                    \centering
+                    \begin{subfigure}{0.40\textwidth}
+                        \centering
+                        \includegraphics[width=\textwidth]
+                                {../../Programming/Morley Element for Biharmonic Equation/image/pic1FEM_0.25.pdf}
+                        \caption{云图}
+                    \end{subfigure}
+                    \begin{subfigure}{0.40\textwidth}
+                        \centering
+                        \includegraphics[width=\textwidth]
+                                {../../Programming/Morley Element for Biharmonic Equation/image/pic2FEM_0.25.pdf}
+                        \caption{三维图}
+                    \end{subfigure}
+                    \caption{$h=0.25$ 时有限元解的图像}
+                    \label{fig: $h=0.25$ 时有限元解的图像}
+                \end{figure}
+                \begin{figure}[htbp]
+                    \centering
+                    \begin{subfigure}{0.40\textwidth}
+                        \centering
+                        \includegraphics[width=\textwidth]
+                                {../../Programming/Morley Element for Biharmonic Equation/image/pic1FEM_0.125.pdf}
+                        \caption{云图}
+                    \end{subfigure}
+                    \begin{subfigure}{0.40\textwidth}
+                        \centering
+                        \includegraphics[width=\textwidth]
+                                {../../Programming/Morley Element for Biharmonic Equation/image/pic2FEM_0.125.pdf}
+                        \caption{三维图}
+                    \end{subfigure}
+                    \caption{$h=0.125$ 时有限元解的图像}
+                    \label{fig: $h=0.125$ 时有限元解的图像}
+                \end{figure}
+                \begin{figure}[htbp]
+                    \centering
+                    \begin{subfigure}{0.40\textwidth}
+                        \centering
+                        \includegraphics[width=\textwidth]
+                                {../../Programming/Morley Element for Biharmonic Equation/image/pic1FEM_0.0625.pdf}
+                        \caption{云图}
+                    \end{subfigure}
+                \begin{subfigure}{0.40\textwidth}
+                        \centering
+                        \includegraphics[width=\textwidth]
+                                {../../Programming/Morley Element for Biharmonic Equation/image/pic2FEM_0.0625.pdf}
+                        \caption{三维图}
+                    \end{subfigure}
+                    \caption{$h=0.0625$ 时有限元解的图像}
+                    \label{fig: $h=0.0625$ 时有限元解的图像}
+                \end{figure}
+\end{enumerate}
+
+\section*{2. Nabla 算子的相关结论}
+
+\begin{enumerate}
+    \item[(a)] 用 Einstein 求和约定容易得到
+    \begin{equation}
+        \begin{aligned}
+            \nabla \cdot (\nabla \times \vec{u}) 
+            &= \partial_i(\epsilon_{ijk}\partial_j u_k) \\
+            &= \partial_j(\epsilon_{ijk}\partial_i u_k) \\
+            &= -\partial_i(\epsilon_{ijk}\partial_j u_k) 
+            =-\nabla \cdot (\nabla \times \vec{u}) \\
+        \end{aligned}
+    \end{equation}
+    \begin{equation}
+        \begin{aligned}
+            \nabla \times (\nabla v) 
+            &= \epsilon_{ijk}\partial_j (\partial_k v) e_i \\
+            &= \epsilon_{ijk}\partial_k (\partial_j v) e_i \\
+            &= -\epsilon_{ijk}\partial_j (\partial_k v) e_i 
+            =-\nabla \times (\nabla v)  \\
+        \end{aligned}
+    \end{equation}
+    可得恒等式成立。
+    \item[(b)] 由 Stokes 定理可得
+        \begin{equation}
+            \int_{\partial \Omega} \vec{u} \cdot \text{d}l
+            =\int_{\Omega} \nabla \times \vec{u} \text{d}S
+            =0
+        \end{equation}
+        因此我们可以定义
+        \begin{equation}
+            \phi(\vec{r})=\int_{\vec{r}_0}^{\vec{r}} \vec{u} \cdot \text{d}l
+        \end{equation}
+        积分路径可以取从 $\vec{r}_0$ 到 $\vec{r}$ 的任意路径。
+        则有 $\nabla \phi=\vec{u}$。\\
+        另一方面，根据 Helmholtz 分解定理，任何向量场 $\vec{u}$ 都可以分解为
+        \begin{equation}
+            \vec{u} = \nabla \phi + \nabla \times \vec{\varphi}
+        \end{equation}
+        两边取散度可以得到
+        \begin{equation}
+            \begin{gathered}
+                \nabla \cdot \vec{u} = \nabla \cdot (\nabla \phi) 
+                + \nabla \cdot (\nabla \times \vec{\varphi})\\
+                0= \nabla \cdot \nabla \phi \\
+            \end{gathered}
+        \end{equation}
+        显然 $\phi$ 满足一个调和方程，因此在要求有界性的条件下，$\phi$ 是一个确定的常数。
+        于是就有 $\vec{u}=\nabla \times \vec{\varphi}$。
+\end{enumerate}
+
+% ===============================================
+
+\printbibliography
+
+\end{document}
